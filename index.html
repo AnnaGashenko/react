@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacts search</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id='content'></div>
+
+<script type="text/babel">
+
+    /* Список контактов  */
+    var CONTACTS = [
+        {
+            id: 1,
+            name: 'Darth Vader',
+            phoneNumber: '+250966666666',
+            image: 'http://cs7.pikabu.ru/images/big_size_comm_an/2014-03_7/13962622876915.gif'
+        }, {
+            id: 2,
+            name: 'Princess Leia',
+            phoneNumber: '+250966344466',
+            image: 'http://images6.fanpop.com/image/photos/33100000/CARRIE-FISHER-anakin-vader-and-princess-leia-33186069-190-149.gif'
+        }, {
+            id: 3,
+            name: 'Luke Skywalker',
+            phoneNumber: '+250976654433',
+            image: 'img/14264215682890-anigif_enhanced-buzz-13518-1367608452-4.gif'
+        }, {
+            id: 4,
+            name: 'Chewbacca',
+            phoneNumber: '+250456784935',
+            image: 'https://media.giphy.com/media/RUUdVZqwpfTRS/giphy.gif'
+        }
+    ];
+
+    /* Делаем отделый компонент для контактов */
+    var Contact = React.createClass({
+        render: function () {
+            return (
+                /*
+                * Чтобы прописать стили тегам, нельзя просто написать class=""
+                * js не поймет что это, нужно писать className
+                */
+                    <li className="contact">
+                        <img className="contact-image" src={this.props.image} width="60px" height="60px" />
+                        <div className="contact-info">
+                            <div className="contact-name">{this.props.name}</div>
+                            <div className="contact-number">{this.props.phoneNumber}</div>
+                        </div>
+                    </li>
+            );
+        }
+    });
+
+
+    /**
+     * Реализовываем поиск по контактам
+     */
+    var ContactsList = React.createClass({
+        // метод getInitialState вызывается перед тем как наш компонент отобразится в доме
+        // он возвращает объект который соответсвует состоянию нашего компонента
+        getInitialState: function () {
+            return {
+                // те контакты которые сейчас отображаются
+                // этим полем можно уже манипулировать внутри компонента
+                displayedContacts: CONTACTS
+            };
+        },
+        // ф-я поиска данных
+        handleSearch: function (event) {
+            // записываем в переменную, то что мы ищем в контактах, то что ввели в инпут
+            // преодбазовали слово в нижний регистр
+            var searchQuery = event.target.value.toLowerCase();
+            // создаем новый массив контактов для отображения
+            var displayedContacts = CONTACTS.filter(function (el) {
+                // записываем значение инпута в нижнем регмистре
+                var searchValue = el.name.toLowerCase();
+                // если в этой строке присутствует строка которую ввел пользователь, то возвращаем true
+                // метод indexOf возвращает -1 когда елемент не содержит это строку
+               return searchValue.indexOf(searchQuery) !== -1;
+            });
+
+            // метод setState принимает объект к-й соответсвует обновленному состоянию нашего компонента
+            // когда мы вызываем этот метод, мы как бы говорим РЕАКТУ: обнови состояние и сделать перерендер нашего компонента
+            this.setState({
+                displayedContacts: displayedContacts
+            });
+        },
+        render: function () {
+            return (
+                <div className="contacts">
+
+                    <input type="text" className="search-field" onChange={this.handleSearch} />
+                    <ul className="contacts-list">
+                        {
+                            // отображаем только те контакты к-е находятся в состоянии компонента displayedContacts
+                            this.state.displayedContacts.map(function (el) {
+                                return <Contact
+                                    key={el.id}
+                                    name={el.name}
+                                    phoneNumber={el.phoneNumber}
+                                    image={el.image}
+                                />;
+                            })
+                        }
+                    </ul>
+                </div>
+            );
+        }
+    });
+
+    ReactDOM.render(
+            <ContactsList />,
+        document.getElementById("content")
+    );
+
+</script>
+</body>
+</html>
